@@ -11,7 +11,7 @@ public class PlayerMovement : MonoBehaviour
     public float jumpHeight = 3f;
     public float airSpeed = 0.2f;
 
-    Vector3 velocity;
+    public Vector3 velocity;
 
     public Transform groundCheck;
     public float groundDistance = 0.4f;
@@ -20,7 +20,8 @@ public class PlayerMovement : MonoBehaviour
     public Transform wallCheck;
     public float wallDistasnce = 1f;
     public LayerMask wallMask;
-    public float walljumpVelocity = 150f;
+    public float walljumpVelocity = 17f;
+    public float wallJumpHeight = 10;
 
     private bool isGrounded;
     private bool isWallrunning;
@@ -68,7 +69,7 @@ public class PlayerMovement : MonoBehaviour
         isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
         isWallrunning = Physics.CheckSphere(wallCheck.position, wallDistasnce, wallMask);
 
-        isSliding = Input.GetKeyDown(KeyCode.LeftShift);
+        isSliding = Input.GetKey("left shift");
 
 
         if (isGrounded && velocity.y < 0)
@@ -79,29 +80,31 @@ public class PlayerMovement : MonoBehaviour
         float x = Input.GetAxis("Horizontal");
         float z = Input.GetAxis("Vertical");
 
-
-        if (isGrounded)
-        {
-            velocity.x = 0;
-            velocity.z = 0;
-            move = transform.right * x + transform.forward * z;
-        }
-        else if (isWallrunning)
-        {
-            move = transform.forward * z;
-        }
-        else if(isSliding)
+        if (isSliding)
         {
             move = lastmove;
+            controller.height = Mathf.Lerp(controller.height, 1.9f, 5 * Time.deltaTime);
         }
-        else
-        {
-            move = lastmove + (transform.right * x * airSpeed) + (transform.forward * z * airSpeed);
+        else {
+            controller.height = Mathf.Lerp(controller.height, 3.8f, 5 * Time.deltaTime);
+
+            if (isGrounded)
+            {
+                velocity.x = 0;
+                velocity.z = 0;
+                move = transform.right * x + transform.forward * z;
+            }
+            else if (isWallrunning)
+            {
+                move = transform.forward * z + transform.right * x;
+            }
+            else
+            {
+                move = lastmove + (transform.right * x * airSpeed) + (transform.forward * z * airSpeed);
+            }
         }
 
         controller.Move(move * speed * Time.deltaTime);
-
-        
 
         if (isWallrunning)
         {
@@ -129,15 +132,17 @@ public class PlayerMovement : MonoBehaviour
     {
         if (isWallrunning && hit.normal.y < 0.1f)
         {
+            Debug.DrawRay(hit.point, hit.normal, Color.red, 1.25f);
+
             if (Input.GetButton("Jump"))
             {
-                Debug.DrawRay(hit.point, hit.normal, Color.red, 1.25f);
-
-                velocity.y = Mathf.Sqrt(jumpHeight * -1 * gravity);
+                velocity.y = Mathf.Sqrt(wallJumpHeight * -1 * gravity);
 
                 //Pfusch around
                 velocity.x = hit.normal.x * walljumpVelocity;
-                velocity.z = hit.normal.y * walljumpVelocity;
+                velocity.z = hit.normal.z * walljumpVelocity;
+                //Fail der Hölle
+                //velocity.y = hit.normal.z * walljumpVelocity;
 
             }
         }

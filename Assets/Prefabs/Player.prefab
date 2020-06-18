@@ -287,7 +287,7 @@ CharacterController:
   m_Height: 3.8
   m_Radius: 0.6
   m_SlopeLimit: 45
-  m_StepOffset: 0.7
+  m_StepOffset: 2
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0, z: 0}
@@ -304,12 +304,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   controller: {fileID: 1368444305560675519}
-  speed: 20
-  gravity: -15
+  speed: 12
+  gravity: -20
   jumpHeight: 5
-  airSpeed: 0.005
+  airSpeed: 0.015
+  velocity: {x: 0, y: 0, z: 0}
   groundCheck: {fileID: 1368444305247329184}
-  groundDistance: 0.4
+  groundDistance: 0.5
   groundMask:
     serializedVersion: 2
     m_Bits: 256
@@ -318,4 +319,6 @@ MonoBehaviour:
   wallMask:
     serializedVersion: 2
     m_Bits: 512
-  walljumpVelocity: 15
+  walljumpVelocity: 12
+  wallJumpHeight: 8
+  minHeight: -50
